@@ -1,29 +1,23 @@
 <template>
   <div class="index">
-    <p>HelloWorld</p>
+    <p>{{date | dateFmt}}</p>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
 import request from "utils/request";
-import "../mock";
 
 export default {
   name: "index",
   data() {
     return {
-      mockData: ""
+      date: null
     };
   },
   mounted() {
-    request({
-      url: "/api/users",
-      methods: "get"
-    }).then(res => {
-      console.log(res);
-      this.mockData = res;
-    });
+    setInterval(() => {
+      this.date = new Date();
+    }, 1000);
   }
 };
 </script>

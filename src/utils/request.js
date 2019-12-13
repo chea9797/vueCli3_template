@@ -22,7 +22,7 @@ service.interceptors.request.use(
 // response 拦截器
 service.interceptors.response.use(
   response => {
-    const res = response.data;
+    const res = { data: response.data, status: res.status };
     // 这里处理一些response 正常放回时的逻辑
 
     return res;
