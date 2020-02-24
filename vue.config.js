@@ -4,8 +4,7 @@ function resolve(dir) {
 }
 //删除console
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
-// gzip压缩
-const CompressionWebpackPlugin = require("compression-webpack-plugin");
+
 module.exports = {
   // 配置
   chainWebpack: config => {
@@ -19,12 +18,6 @@ module.exports = {
       .set("static", resolve("src/static"))
       .set("store", resolve("src/store"))
       .set("views", resolve("src/views"));
-    //压缩文件
-    config.optimization.minimize(true);
-    //分割代码
-    config.optimization.splitChunks({
-      chunks: "all"
-    });
   },
   //删除控制台输出
   configureWebpack: config => {
@@ -42,29 +35,21 @@ module.exports = {
             }
           },
           sourceMap: false,
-          parallel: true
+          parallel: true //多线程打包
         })
       );
       config.plugins = [...config.plugins, ...plugins];
-      // gzip压缩
-      const productionGzipExtensions = ["html", "js", "css"];
-      config.plugins.push(
-        new CompressionWebpackPlugin({
-          filename: "[path].gz[query]",
-          algorithm: "gzip",
-          test: new RegExp("\\.(" + productionGzipExtensions.join("|") + ")$"),
-          threshold: 10240, // 只有大小大于该值的资源会被处理
-          minRatio: 0.8, // 只有压缩率小于这个值的资源才会被处理
-          deleteOriginalAssets: false // 删除原文件
-        })
-      );
     }
   },
-  assetsDir: "assets", // 静态文件目录
+  outputDir: "dist", //输出文件目录
+  assetsDir: "static", // 静态资源目录
   publicPath: "./", // 编译后的地址，可以根据环境进行设置
+  indexPath: "index.html", // 项目入口文件
   lintOnSave: true, // 是否开启编译时是否不符合eslint提示
-  productionSourceMap: false,
+  filenameHashing: true, //静态资源文件名中加入hash
+  productionSourceMap: process.env.NODE_ENV === "production" ? false : true,
   css: {
+    extract: process.env.NODE_ENV === "production" ? true : false, //从js中提取css 开发环境会影响css热重载
     loaderOptions: {
       // pass options to sass-loader
       sass: {
