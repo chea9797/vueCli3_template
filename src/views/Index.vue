@@ -15,6 +15,7 @@ export default {
     };
   },
   mounted() {
+    console.log("测试我被删除了没");
     setInterval(() => {
       this.date = new Date();
     }, 1000);
