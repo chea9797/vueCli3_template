@@ -3,6 +3,9 @@ const path = require("path");
 //判断是否生产环境
 const IS_PROD = process.env.NODE_ENV === "production" ? true : false;
 
+//是否pad端H5应用
+const IS_PAD = JSON.parse(process.env.VUE_APP_ISPAD);
+
 function resolve(dir) {
   return path.join(__dirname, dir);
 }
@@ -11,8 +14,16 @@ function resolve(dir) {
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 
 module.exports = {
-  // 配置
   chainWebpack: (config) => {
+    /* 添加分析工具 */
+    if (process.env.npm_config_report) {
+      config
+        .plugin('webpack-bundle-analyzer')
+        .use(require('webpack-bundle-analyzer').BundleAnalyzerPlugin)
+        .end()
+      config.plugins.delete('prefetch')
+    }
+
     // 配置别名
     config.resolve.alias
       .set("@", resolve("src"))
@@ -23,8 +34,10 @@ module.exports = {
       .set("static", resolve("src/static"))
       .set("store", resolve("src/store"))
       .set("views", resolve("src/views"));
+
+
   },
-  //删除控制台输出
+  //配置
   configureWebpack: (config) => {
     if (IS_PROD) {
       const plugins = [];
@@ -34,7 +47,7 @@ module.exports = {
             //生产环境自动删除console
             compress: {
               warnings: false, // 若打包错误，则注释这行
-              drop_console: true,
+              drop_console: false,
               drop_debugger: false,
               pure_funcs: ["console.log"],
             },
@@ -47,14 +60,28 @@ module.exports = {
       config.entry.app = ["babel-polyfill", "./src/main.js"]; //解决低版本兼容
     }
   },
+  devServer: {
+    host: '192.168.4.234',
+    port: 2233,
+    /* proxy: {
+      //配置跨域
+      "/api": {
+        target: "http://192.168.4.212:8086", //这里后台的地址模拟的;应该填写你们真实的后台接口
+        ws: false, //是否使用https
+        changOrigin: true, //允许跨域
+        pathRewrite: {
+          "^/api": "",
+        },
+      },
+    }, */
+  },
   outputDir: process.env.VUE_APP_NAME, //输出文件目录
   assetsDir: "static", // 静态资源目录
-  publicPath: IS_PROD
-    ? `http://192.168.1.172:8087/c/gf?path=${process.env.VUE_APP_NAME}`
-    : "./", // 编译后的地址，可以根据环境进行设置
+  publicPath: IS_PROD && IS_PAD ?
+    `http://192.168.1.172:8087/c/gf?path=${process.env.VUE_APP_NAME}` : "./", // 编译后的地址，可以根据环境进行设置
   indexPath: "index.html", // 项目入口文件
   lintOnSave: false, // 是否开启编译时是否不符合eslint提示
-  filenameHashing: !IS_PROD, //静态资源文件名中加入hash
+  filenameHashing: !IS_PAD, //静态资源文件名中加入hash
   productionSourceMap: !IS_PROD,
   css: {
     extract: IS_PROD, //从js中提取css 开发环境会影响css热重载
@@ -73,7 +100,7 @@ module.exports = {
       sass: {
         // @/ is an alias to src/
         data: `
-               @import "@/assets/css/variable.scss"; 
+               @import "@/assets/css/variable.scss";
                @import "@/assets/css/common.scss";
                @import "@/assets/css/mixin.scss";
               `,

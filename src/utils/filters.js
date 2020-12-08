@@ -1,4 +1,4 @@
-import moment from "moment"; //时间格式化插件
+import moment from "dayjs"; //时间格式化插件
 
 //格式化时间
 export function dateFmt(date, format = "YYYY-MM-DD hh:mm:ss") {

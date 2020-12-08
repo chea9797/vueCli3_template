@@ -1,6 +1,6 @@
 <template>
   <div class="index">
-    <p>{{date | dateFmt}}</p>
+    <p @click.once="touch()">{{date | dateFmt}}</p>
   </div>
 </template>
 
@@ -11,15 +11,22 @@ export default {
   name: "index",
   data() {
     return {
-      date: null
+      date: null,
     };
+  },
+  methods: {
+    touch() {
+      alert(1);
+      debugger;
+      alert(2);
+    },
   },
   mounted() {
     console.log("测试我被删除了没");
     setInterval(() => {
       this.date = new Date();
     }, 1000);
-  }
+  },
 };
 </script>
 <style lang="scss" scoped>
