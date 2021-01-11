@@ -10,8 +10,8 @@ function resolve(dir) {
   return path.join(__dirname, dir);
 }
 
-//引入删除项目console输出依赖包
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+/* //引入删除项目console输出依赖包
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin"); */
 
 module.exports = {
   chainWebpack: (config) => {
@@ -42,7 +42,7 @@ module.exports = {
     if (IS_PROD) {
       const plugins = [];
       plugins.push(
-        new UglifyJsPlugin({
+        /* new UglifyJsPlugin({
           uglifyOptions: {
             //生产环境自动删除console
             compress: {
@@ -54,7 +54,7 @@ module.exports = {
           },
           sourceMap: false,
           parallel: true, //多线程打包
-        })
+        }) */
       );
       config.plugins = [...config.plugins, ...plugins];
       config.entry.app = ["babel-polyfill", "./src/main.js"]; //解决低版本兼容
@@ -77,7 +77,7 @@ module.exports = {
   },
   outputDir: process.env.VUE_APP_NAME, //输出文件目录
   assetsDir: "static", // 静态资源目录
-  publicPath: IS_PROD && IS_PAD ?
+  publicPath: IS_PAD ?
     `http://192.168.1.172:8087/c/gf?path=${process.env.VUE_APP_NAME}` : "./", // 编译后的地址，可以根据环境进行设置
   indexPath: "index.html", // 项目入口文件
   lintOnSave: false, // 是否开启编译时是否不符合eslint提示
@@ -99,7 +99,7 @@ module.exports = {
       // pass options to sass-loader
       sass: {
         // @/ is an alias to src/
-        data: `
+        prependData: `
                @import "@/assets/css/variable.scss";
                @import "@/assets/css/common.scss";
                @import "@/assets/css/mixin.scss";

@@ -1,6 +1,11 @@
 <template>
   <div class="index">
-    <p @click.once="touch()">{{date | dateFmt}}</p>
+    <p @click.once="touch()">{{ date | dateFmt }}</p>
+    <div id="box">
+      <ul>
+        <li v-for="item in 30" :key="item">{{ item }}</li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -46,6 +51,22 @@ export default {
     height: 100px;
     text-align: center;
     font-size: 26px;
+  }
+  #box {
+    height: 500px;
+    overflow-y: scroll;
+    ul {
+      height: auto;
+      li {
+        height: 50px;
+        font-size: 30px;
+        text-align: center;
+        background-color: #eee;
+        &:nth-of-type(even) {
+          background-color: #ccc;
+        }
+      }
+    }
   }
 }
 </style>
