@@ -13,6 +13,9 @@ function resolve(dir) {
 //引入删除项目console输出依赖包
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 
+//引入vConsole
+const vConsole = require("vconsole-webpack-plugin");
+
 module.exports = {
   chainWebpack: (config) => {
     /* 添加分析工具 */
@@ -62,8 +65,9 @@ module.exports = {
   },
   //配置
   configureWebpack: (config) => {
+    const plugins = [];
+    //生产环境清除打印日志
     if (IS_PROD) {
-      const plugins = [];
       plugins.push(
         new UglifyJsPlugin({
           uglifyOptions: {
@@ -79,9 +83,17 @@ module.exports = {
           parallel: true, //多线程打包
         })
       );
-      config.plugins = [...config.plugins, ...plugins];
-      config.entry.app = ["babel-polyfill", "./src/main.js"]; //解决低版本兼容
     }
+    //开发环境引入vConsole
+    plugins.push(
+      //手机端调试
+      new vConsole({
+        filter: [], // 需要过滤的入口文件
+        enable: IS_PROD // 生产环境不打开
+      })
+    )
+    config.plugins = [...config.plugins, ...plugins];
+    config.entry.app = ["babel-polyfill", "./src/main.js"]; //解决低版本兼容
   },
   devServer: {
     // host: '192.168.4.118',
