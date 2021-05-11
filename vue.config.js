@@ -10,8 +10,8 @@ function resolve(dir) {
   return path.join(__dirname, dir);
 }
 
-/* //引入删除项目console输出依赖包
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin"); */
+//引入删除项目console输出依赖包
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 
 module.exports = {
   chainWebpack: (config) => {
@@ -23,6 +23,29 @@ module.exports = {
         .end()
       config.plugins.delete('prefetch')
     }
+
+    //代码分离
+    config
+      .optimization.splitChunks({
+        chunks: 'all', //async异步代码分割 initial同步代码分割 all同步异步分割都开启
+        minSize: 30000, //字节 引入的文件大于30kb才进行分割
+        maxSize: 50000, //尝试将大于50kb的文件拆分成n个50kb的文件
+        minChunks: 1, //模块引入次数
+        automaticNameDelimiter: '~', //缓存组和生成文件名称之间的连接符
+        name: true, //缓存组里面的filename生效，覆盖默认命名
+        cacheGroups: { //缓存组，将所有加载模块放在缓存里面一起分割打包
+          vendors: { //自定义打包模块
+            filename: 'vendors.js',
+            test: resolve('./static'),
+            priority: 20, //优先级，先打包到哪个组里面，值越大，优先级越高
+          },
+          vantUI: {
+            name: 'chunk-vnatUI', // split elementUI into a single package
+            priority: 20, // the weight needs to be larger than libs and app or it will be packaged into libs or app
+            test: /[\\/]node_modules[\\/]_?vant(.*)/ // in order to adapt to cnpm
+          },
+        }
+      })
 
     // 配置别名
     config.resolve.alias
@@ -42,7 +65,7 @@ module.exports = {
     if (IS_PROD) {
       const plugins = [];
       plugins.push(
-        /* new UglifyJsPlugin({
+        new UglifyJsPlugin({
           uglifyOptions: {
             //生产环境自动删除console
             compress: {
@@ -54,14 +77,14 @@ module.exports = {
           },
           sourceMap: false,
           parallel: true, //多线程打包
-        }) */
+        })
       );
       config.plugins = [...config.plugins, ...plugins];
       config.entry.app = ["babel-polyfill", "./src/main.js"]; //解决低版本兼容
     }
   },
   devServer: {
-    host: '192.168.4.234',
+    // host: '192.168.4.118',
     port: 2233,
     /* proxy: {
       //配置跨域
