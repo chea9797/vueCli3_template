@@ -89,7 +89,7 @@ module.exports = {
       //手机端调试
       new vConsole({
         filter: [], // 需要过滤的入口文件
-        enable: IS_PROD // 生产环境不打开
+        enable: !IS_PROD // 生产环境不打开
       })
     )
     config.plugins = [...config.plugins, ...plugins];
